@@ -1,0 +1,84 @@
+
+    var verifyCode ;
+    var $rentForm = $("[name='areaForm']");
+    var contextPath = '/pkt';
+    $(document).ready(function() {
+        $buttonReserve.empty().append($buttonReserveImgH);
+    }); 
+	$(document).keydown(function(event){
+	  switch(event.keyCode){
+		 case 13:return false; 
+		 }
+	});
+    if(false) {
+        alert("无车位可预约！");
+    }
+
+    if(false) {
+        alert("当前系统繁忙!请重试");
+    }
+
+    if(false) {
+        alert("不在预约时间,不能预约!");
+    }
+    if(false) {
+        alert("验证码不正确或已过期!");
+    }
+    if(false) {
+        alert("您在黑名单,不能预约！");
+    }
+
+    // 预约
+    $('#rent').live('click', function(e) {
+        if(!$("#verifyCode").val()){
+            alert("请输入验证码");
+            return;
+         }
+        var  license_plate = $("[name='license_plate']").val();
+        var  booking_time = $("[name='booking_time']").val();
+        var isBlacklist = false;
+        $(this).attr('id','unrent');
+        $.ajax({
+            url: '/pkt/service/isBlacklist?booking_time=' + booking_time + '&licensePlate=' + encodeURI(encodeURI(license_plate)),
+            method: 'post',
+            async: false,
+            cache: false,
+            contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+            success: function (data) {
+                if (!data.isSuccess) {
+                    isBlacklist = true;
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+
+        if(isBlacklist) {
+            alert("您在黑名单,不能预约！");
+            window.location.reload();
+        } else {
+            $rentForm.attr("action", "parkingBooking");
+            $rentForm.submit();
+        }
+    });
+
+    function reloadValidateCode(){
+    	var randomNumber = new Date()+Math.floor(Math.random() * Math.pow(10, 8));
+        $("#validateCodeImg").attr("src","/pkt/service/getCode?random="+randomNumber);
+    }
+    
+    
+    
+
+    
+        
+        
+        
+    
+
+    
+        
+        
+        
+    
