@@ -10,14 +10,14 @@ import random
 from urllib import request, parse
 import easyocr
 
-USERNAME = "mabaolai"
-PASSWORD = "123456"
-LICENSE_PLATE = "苏E5P623"
+USERNAME = ""
+PASSWORD = ""
+LICENSE_PLATE = ""
 CACHE_FILE = "cache.txt"
 SESSION_KEY = "JSESSIONID"
 SAVE_SESSION_TIME = 2 * 3600 # session本地保存时间
 RELOGIN_TIME = 5 * 60 # 距离上次操作超过5分钟，重新登陆
-SVR_HOST = "http://221.178.136.186:8090"
+SVR_HOST = ""
 LOGIN_PAGE_URL = "{0}/pkt/login/loginPage".format(SVR_HOST)
 LOGIN_PROCESS_URL = "{0}/pkt/login/loginProcess".format(SVR_HOST)
 RESERVE_PAGE_URL = "{0}/pkt/service/reservePage".format(SVR_HOST)
