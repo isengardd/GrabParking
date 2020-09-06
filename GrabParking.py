@@ -50,13 +50,16 @@ class CacheFileData:
     self.lastOpTime = 0 #使用该session上次调用api的时间戳
 
   def loadFromJsonStr(self, jsonStr):
-    fileDataDic = json.loads(jsonStr)
-    if fileDataDic.get("session") != None:
-      self.session = fileDataDic["session"]
-    if fileDataDic.get("session_time") != None:
-      self.sessionTime = int(fileDataDic["session_time"])
-    if fileDataDic.get("last_op_time") != None:
-      self.lastOpTime = int(fileDataDic["last_op_time"])
+    try:
+      fileDataDic = json.loads(jsonStr)
+      if fileDataDic.get("session") != None:
+        self.session = fileDataDic["session"]
+      if fileDataDic.get("session_time") != None:
+        self.sessionTime = int(fileDataDic["session_time"])
+      if fileDataDic.get("last_op_time") != None:
+        self.lastOpTime = int(fileDataDic["last_op_time"])
+    except:
+      pass
 
   def genJsonStr(self):
     dataDic = dict()
@@ -351,8 +354,12 @@ reader = easyocr.Reader(['en'], gpu = False)
 if __name__ == "__main__":
   # 读取文件数据
   cacheFilePath = os.path.join(os.getcwd(), CACHE_FILE)
-  with open(cacheFilePath, "r+") as sessionFile:
-    CACHE_DATA.loadFromJsonStr(sessionFile.read())
+  if not os.path.exists(cacheFilePath):
+    with open(cacheFilePath, "w+") as sessionFile:
+      pass
+  else:
+    with open(cacheFilePath, "r+") as sessionFile:
+      CACHE_DATA.loadFromJsonStr(sessionFile.read())
 
   while True:
     # 只在周日~周4晚18：01运行一次，之后退出

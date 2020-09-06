@@ -1,1 +1,1 @@
-{"session": "667184F7A2B2617B0CC0B282C2F20D51", "session_time": 1599324197, "last_op_time": 1599324197}
+{"session": "", "session_time": 0, "last_op_time": 0}
