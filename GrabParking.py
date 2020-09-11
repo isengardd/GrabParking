@@ -328,6 +328,7 @@ def Logout():
 def GrabParking():
   #登录或者刷新session
   Login()
+  bookingState = BookingState.UNKNOWN
   tryCount = 0
   while tryCount <= 2: # 最多尝试次数
     tryCount += 1
@@ -340,18 +341,26 @@ def GrabParking():
       if verifyCode != "":
         # 查询是否在黑名单
         if False == QueryBlackList():
-          bookingRes = ParkBooking(verifyCode)
-          if bookingRes == BookingState.VERIFY_ERROR:
+          bookingState = ParkBooking(verifyCode)
+          if bookingState == BookingState.VERIFY_ERROR:
             # 如果是验证码错误，重新来一次
             continue
           # 这里应该就成功了，继续模拟一下后续的行为
           MyRentPage()
+          bookingState = GetReservePage()
+        else:
+          bookingState = BookingState.IN_BLACK_LIST
+      else:
+        bookingState = BookingState.VERIFY_ERROR
+        continue
     break
-
+  print('GrabParking res = {0}'.format(bookingState))
+  return bookingState
 
 # 只识别英文
 reader = easyocr.Reader(['en'], gpu = False)
 if __name__ == "__main__":
+  print('tool start')
   # 读取文件数据
   cacheFilePath = os.path.join(os.getcwd(), CACHE_FILE)
   if not os.path.exists(cacheFilePath):
@@ -362,12 +371,14 @@ if __name__ == "__main__":
       CACHE_DATA.loadFromJsonStr(sessionFile.read())
 
   while True:
-    # 只在周日~周4晚18：01运行一次，之后退出
+    # 只在周日~周4晚17:59:57开始运行，23点停止，抢到后退出
     nowTime = datetime.datetime.today()
     weekday = nowTime.weekday()
-    if (weekday == 6 or (weekday >= 0 and weekday <= 3)) and \
-      nowTime.hour >= 18 and nowTime.minute >= 1:
-      GrabParking()
-      break
-    #每一秒判断一次
-    time.sleep(1)
+    if (weekday == 6 or (weekday >= 0 and weekday <= 3)) and nowTime.hour < 23 and \
+      ((nowTime.hour == 17 and nowTime.minute >= 59 and nowTime.second >= 57) or (nowTime.hour >= 18)):
+      bookingState = GrabParking()
+      if (bookingState == BookingState.ORDER_SUCCESS):
+        # 抢成功，退出运行
+        break
+    #休眠一段时间
+    time.sleep(1.5)
